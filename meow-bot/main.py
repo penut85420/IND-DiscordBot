@@ -20,7 +20,10 @@ m = Meow()
 @bot.command(name='召喚貓貓')
 async def meow(ctx):
     uid = ctx.author.id
-    await ctx.send(f'<@{uid}> 貓貓來囉 :heart:', file=discord.File(m.get()))
+    await ctx.send(
+        f'<@{uid}> 貓貓來囉 :heart:',
+        file=discord.File(m.get())
+    )
 
 if __name__ == '__main__':
     token = os.environ['TOKEN']
