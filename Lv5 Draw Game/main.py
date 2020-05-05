@@ -1,7 +1,7 @@
 import os
 import re
-import asyncio
 import random
+import asyncio
 import discord
 from collections import namedtuple
 
@@ -11,11 +11,13 @@ class Player:
         self.diamonds = 0
         self.total = [0, 0, 0]
 
-class HelloClient(discord.Client):
+class DrawGameBot(discord.Client):
     def __init__(self, *args, **kwargs):
         self.data = {}
         self.prob = [100, 10, 1]
         self.name = ['4 星', '5 星', '6 星']
+        self.money = list(range(1000))
+        self.money_prob = list(range(500)) + list(reversed(range(500)))
         self.card = {
             '4 星': [
                 '熱血的鵝卵石', '善良的芭樂', '活潑的香蕉皮', '憤怒的葡萄籽',
@@ -79,15 +81,27 @@ class HelloClient(discord.Client):
         ))
 
     async def cmd_earn(self, msg, args):
-        uid, player = self.get_player(msg)
+        try:
+            n = int(args[0])
+        except:
+            n = 1
+        
+        _send = msg.channel.send
+        if n > 1:
+            await _send('打工超過一次的結果將會以私人訊息傳送！')
+            _send = msg.author.send
 
-        money = random.randint(0, 100)
-        player.money += money
-        self.data[uid] = player
+        for _ in range(n):
+            uid, player = self.get_player(msg)
 
-        rtn = f'{self.tag_name(msg)} 打工賺錢，獲得了 {money} 元！'
+            money = random.choices(self.money, weights=self.money_prob)[0]
+            player.money += money
+            self.data[uid] = player
 
-        await self.send_msg(msg, rtn)
+            rtn = f'{self.tag_name(msg)} 打工賺錢，獲得了 {money} 元！'
+
+            await _send(rtn)
+            await asyncio.sleep(1)
 
     async def cmd_status(self, msg, args):
         uid, player = self.get_player(msg)
@@ -200,6 +214,11 @@ class HelloClient(discord.Client):
         rtn = f'{self.tag_name(msg)} 發動作弊之力，獲得了 100000 的金錢與鑽石！'
         await self.send_msg(msg, rtn)
 
+    async def cmd_bye(self, msg, args):
+        await msg.channel.send('Bye!')
+        await self.logout()
+        await self.close()
+
     async def send_msg(self, msg, rtn):
         await msg.channel.send(rtn)
 
@@ -214,4 +233,4 @@ class HelloClient(discord.Client):
 
 if __name__ == '__main__':
     token = os.environ['TOKEN']
-    HelloClient().run(token)
+    DrawGameBot().run(token)
