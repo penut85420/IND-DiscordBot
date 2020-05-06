@@ -95,6 +95,10 @@ class HelloClient(discord.Client):
             await m.delete()
             i += 1
 
+    async def cmd_bye(self, msg, args):
+        await self.logout()
+        await self.close()
+
     async def on_member_update(self, before, after):
         if after.guild.id not in self.registered_channels:
             return

@@ -15,33 +15,41 @@ class GuessNumber(discord.Client):
             await self.logout()
             await self.close()
         elif ctx.content == '!猜數字':
-            if ctx.channel in self.guessing:
-                await ctx.channel.send(f'{ctx.author.mention} 你們已經在猜數字了！')
-                return
-            self.guessing.add(ctx.channel)
-            await self.guess_number(ctx)
-            self.guessing.remove(ctx.channel)
+            await self.guessing_process(ctx)
+
+    async def guessing_process(self, ctx: discord.Message):
+        if ctx.channel in self.guessing:
+            await ctx.channel.send(f'{ctx.author.mention} 你們已經在猜數字了！')
+            return
+        
+        self.guessing.add(ctx.channel)
+        await ctx.channel.send(f'{ctx.channel.mention} 的猜數字遊戲開始囉！')
+        
+        await self.guess_number(ctx)
+        
+        self.guessing.remove(ctx.channel)
+        await ctx.channel.send(f'{ctx.channel.mention} 的猜數字遊戲結束了！')
 
     async def guess_number(self, ctx: discord.Message):
-        lower = 0
-        upper = 100
+        lower, upper, guess = 1, 99, -1
         number = random.randint(lower, upper)
-        guess = -1
+        
         send = ctx.channel.send
         def check(m: discord.Message):
             return m.channel == ctx.channel and m.author != self.user
 
+        prefix = ''
         while guess != number:
-            await send(f'請在 {lower} 到 {upper} 之間猜一個數字')
+            await send(f'{prefix}請在 {lower} 到 {upper} 之間猜一個數字')
             msg = await self.wait_for('message', check=check)
             try:
                 guess = int(msg.content)
             except:
                 await send(f'{msg.author.mention} 請輸入整數！')
             if guess > lower and guess < number:
-                lower = guess
+                prefix, lower = '太小囉！', guess
             elif guess < upper and guess > number:
-                upper = guess
+                prefix, upper = '太大囉！', guess
 
         await send(f'恭喜 {msg.author.mention} 猜對了！')
 
