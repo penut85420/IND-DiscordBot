@@ -14,26 +14,33 @@ class GuessNumber(discord.Client):
         if ctx.content == '!bye':
             await self.logout()
             await self.close()
-        elif ctx.content == '!猜數字':
+        elif ctx.content.startswith('!猜數字'):
             await self.guessing_process(ctx)
 
     async def guessing_process(self, ctx: discord.Message):
         if ctx.channel in self.guessing:
             await ctx.channel.send(f'{ctx.author.mention} 你們已經在猜數字了！')
             return
-        
+
         self.guessing.add(ctx.channel)
         await ctx.channel.send(f'{ctx.channel.mention} 的猜數字遊戲開始囉！')
-        
+
         await self.guess_number(ctx)
-        
+
         self.guessing.remove(ctx.channel)
         await ctx.channel.send(f'{ctx.channel.mention} 的猜數字遊戲結束了！')
 
     async def guess_number(self, ctx: discord.Message):
-        lower, upper, guess = 1, 99, -1
-        number = random.randint(lower, upper)
-        
+        lower, upper, guess = 0, 100, -1
+        args = ctx.content.split(' ')
+        if len(args) > 1:
+            try:
+                upper = int(args[1])
+                assert upper > 2
+            except:
+                upper = 100
+        number = random.randint(lower + 1, upper - 1)
+
         send = ctx.channel.send
         def check(m: discord.Message):
             return m.channel == ctx.channel and m.author != self.user
@@ -50,6 +57,8 @@ class GuessNumber(discord.Client):
                 prefix, lower = '太小囉！', guess
             elif guess < upper and guess > number:
                 prefix, upper = '太大囉！', guess
+            else:
+                prefix = ''
 
         await send(f'恭喜 {msg.author.mention} 猜對了！')
 
