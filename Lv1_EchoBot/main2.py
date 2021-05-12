@@ -21,5 +21,5 @@ async def echo(message):
     await message.channel.send(f'<@!{uid}> 說：「{msg}」')
 
 if __name__ == '__main__':
-    token = os.environ['TOKEN']
+    token = os.getenv('TOKEN')
     client.run(token)

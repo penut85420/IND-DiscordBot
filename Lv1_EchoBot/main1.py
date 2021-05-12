@@ -15,5 +15,5 @@ async def on_message(message):
     await message.channel.send(message.content)
 
 if __name__ == '__main__':
-    token = os.environ['TOKEN']
+    token = os.getenv('TOKEN')
     client.run(token)

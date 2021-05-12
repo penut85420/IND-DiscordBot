@@ -26,5 +26,5 @@ async def meow(ctx):
     )
 
 if __name__ == '__main__':
-    token = os.environ['TOKEN']
+    token = os.getenv('TOKEN')
     bot.run(token)

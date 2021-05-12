@@ -1,6 +1,7 @@
 import re
 import os
 import discord
+import pickle as pk
 from collections import namedtuple
 
 Config = namedtuple('Config', ['channel', 'right_role', 'wrong_role', 'fmt'])
@@ -84,7 +85,7 @@ class HelloClient(discord.Client):
             wrong_role=wrong_role,
             fmt=' '.join(args[3:])
         )
-        
+
         print(self.registered_channels)
 
     async def cmd_clear(self, msg, args):
@@ -154,5 +155,5 @@ def dump_pkl(obj, path):
         pk.dump(obj, pkl)
 
 if __name__ == '__main__':
-    token = os.environ['TOKEN']
+    token = os.getenv('TOKEN')
     HelloClient().run(token)

@@ -16,5 +16,5 @@ async def draw(ctx):
     await ctx.channel.send(rtn)
 
 if __name__ == '__main__':
-    token = os.environ['TOKEN']
+    token = os.getenv('TOKEN')
     bot.run(token)
